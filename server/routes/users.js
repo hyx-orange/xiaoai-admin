@@ -43,11 +43,13 @@ router.post('/register', async ctx => {
     let {
         username,
         password,
+        email,
         sms
     } = ctx.request.body
     let newUser = new User({
         username,
-        password
+        password,
+        email
     })
     let user = await User.find({
         username
@@ -88,9 +90,10 @@ router.post('/login', async ctx => {
         password
     })
 
+
     let token = jwt.sign({
         username: username
-    }, 'secret', {
+    }, secret, {
         expiresIn: '1d'
     })
     if (code.toLowerCase() === (ctx.session.captcha).toLowerCase()) {
@@ -187,7 +190,7 @@ router.post('/findPwd', async ctx => {
             service: 'qq', // 邮箱类型
             secure: true,
             auth: {
-                user: '285258675@qq.com',
+                user: '1843306093@qq.com',
                 pass: emailPass
             }
         })

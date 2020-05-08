@@ -4,7 +4,7 @@ module.exports = {
     msgKey: 'c32cc2c0ea084c9db36d9243041078f1', // 短信发送的key
     emailPass: 'pbzazeuezsewfbfb', // 发送邮件的pass
     scope: ['user'],
-    secret: '',
+    secret: 'lrlaym',
     accessKeyId: 'LTAI4FpCzJFeLcvtwkhsVukz', // 阿里云短信key
     secretAccessKey: 'wrybZ2IhfvsCkMYjl79jeSN0tjZJIp', // 阿里云短信accessKey
     whitePath: ['/', '/users/login', '/users/register', '/users/captcha', '/users/sendMsg',

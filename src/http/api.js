@@ -33,11 +33,11 @@ export default {
     },
     //修改密码
     updateCPass({ id, password, newpass }) {
-        return service.post('api/users/updatePass', { id, password, newpass })
+        return service.post('/users/updatePass', { id, password, newpass })
     },
     // 找回密码
     forget({ username, email }) {
-        return service.post('api/users/forget', { username, email })
+        return service.post('/users/findPwd', { username, email })
     },
     // 获取用户信息
     queryUser(id) {
@@ -51,8 +51,8 @@ export default {
         return service.get(`api/users/logins?code=${code}&state=${state}`)
     },
     //  退出登录
-    loginOut() {
-        return service.get('api/users/loginOut')
+    logout() {
+        return service.get('/users/logout')
     },
     // 获取用户列表
     userList({ pageSize = 10, pageNumber = 1, keywords = '', state = 1, }) {

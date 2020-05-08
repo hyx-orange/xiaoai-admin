@@ -8,13 +8,18 @@ import dayjs from 'dayjs'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './bus'
+import i18n from './lang/index'
+import IntroJs from 'intro.js'
+import 'intro.js/introjs.css';
 
+Vue.use(IntroJs);
 Vue.use(ElementUI)
 Vue.prototype.$dayjs = dayjs
 Vue.config.productionTip = false
 
 new Vue({
-  router,
-  store,
-  render: h => h(App)
+    router,
+    store,
+    i18n,
+    render: h => h(App)
 }).$mount('#app')

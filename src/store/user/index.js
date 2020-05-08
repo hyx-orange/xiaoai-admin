@@ -86,10 +86,14 @@ export default {
                 let res = await api.login(params)
                 if (res.code === 200) {
                     localStorage.setItem('userInfo', JSON.stringify(res.data))
-                    localStorage.setItem('adminToken', res.data.token)
+                    localStorage.setItem('adminToken', res.token)
                     let { single, username, password } = params
                     if (single) {
-                        localStorage.setItem("checkUser", JSON.stringify({ username, password }));
+                        let phone = null
+                        if (localStorage.getItem('checkUser')) {
+                            phone = JSON.parse(localStorage.getItem('checkUser')).phone
+                        }
+                        localStorage.setItem("checkUser", JSON.stringify({ username, password, phone }));
                     } else {
                         localStorage.removeItem("checkUser");
                     }
@@ -155,6 +159,26 @@ export default {
                 }
             } catch (err) {
                 console.log(err)
+                return false
+            }
+        },
+        // 退出登录
+        async logout({ commit }, phone) {
+            try {
+                let res = await api.logout()
+                if (res.code === 200) {
+                    Notification({
+                        title: res.msg,
+                        type: 'success'
+                    });
+                } else {
+                    Notification({
+                        title: res.msg,
+                        type: 'warning'
+                    });
+                    return false
+                }
+            } catch (err) {
                 return false
             }
         },
