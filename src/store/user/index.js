@@ -86,7 +86,7 @@ export default {
                 let res = await api.login(params)
                 if (res.code === 200) {
                     localStorage.setItem('userInfo', JSON.stringify(res.data))
-                    localStorage.setItem('adminToken', res.token)
+                    localStorage.setItem('adminToken', "Bearer " + res.token)
                     let { single, username, password } = params
                     if (single) {
                         let phone = null
@@ -121,7 +121,19 @@ export default {
                 let res = await api.phoneLogin(params)
                 if (res.code === 200) {
                     localStorage.setItem('userInfo', JSON.stringify(res.data))
-                    localStorage.setItem('adminToken', res.data.token)
+                    localStorage.setItem('adminToken', "Bearer " + res.token)
+                    let { single, phone } = params
+                    if (single) {
+                        let username = null
+                        let password = null
+                        if (localStorage.getItem('checkUser')) {
+                            username = JSON.parse(localStorage.getItem('checkUser')).username
+                            password = JSON.parse(localStorage.getItem('checkUser')).password
+                        }
+                        localStorage.setItem("checkUser", JSON.stringify({ username, password, phone }));
+                    } else {
+                        localStorage.removeItem("checkUser");
+                    }
                     router.push('/home')
                     Notification({
                         title: '登录成功',
@@ -147,6 +159,28 @@ export default {
                 if (res.code === 200) {
                     Notification({
                         title: '密码已发送至邮箱',
+                        type: 'success'
+                    });
+                    return true
+                } else {
+                    Notification({
+                        title: res.msg,
+                        type: 'warning'
+                    });
+                    return false
+                }
+            } catch (err) {
+                console.log(err)
+                return false
+            }
+        },
+        // 修改密码
+        async updatePwd({ commit }, params) {
+            try {
+                let res = await api.updatePwd(params)
+                if (res.code === 200) {
+                    Notification({
+                        title: res.msg,
                         type: 'success'
                     });
                     return true

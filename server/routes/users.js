@@ -3,31 +3,22 @@ const svgCaptcha = require('svg-captcha')
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
-const rp = require('request-promise')
 const fetch = require('node-fetch')
 const { accessKeyId, secretAccessKey, emailPass, clientId, clientSecret, scope, secret } = require('../config')
 const SMSClient = require('@alicloud/sms-sdk')
 const smsClient = new SMSClient({ accessKeyId, secretAccessKey })
-
-
-const requestOption = {
-    method: 'POST'
-}
-
+const menus = require('./menu')
 
 router.prefix('/users')
 
-router.get('/', function(ctx, next) {
-    ctx.body = 'this is a users response!'
-})
 
 // 图形验证码
 router.get('/captcha', async ctx => {
     const cap = svgCaptcha.create({
         size: 4, // 验证码长度
-        width: 160,
-        height: 60,
-        fontSize: 50,
+        width: 106,
+        height: 32,
+        fontSize: 32,
         ignoreChars: '0oO1ilI', // 验证码字符中排除 0o1i
         noise: 2, // 干扰线条的数量
         color: true, // 验证码的字符是否有颜色，默认没有，如果设定了背景，则默认有
@@ -43,12 +34,14 @@ router.post('/register', async ctx => {
     let {
         username,
         password,
-        email,
-        sms
+        sms,
+        phone,
+        email
     } = ctx.request.body
     let newUser = new User({
         username,
         password,
+        phone,
         email
     })
     let user = await User.find({
@@ -82,7 +75,7 @@ router.post('/register', async ctx => {
     }
 })
 
-// 登录
+// 用户名登录
 router.post('/login', async ctx => {
     let { username, password, code } = ctx.request.body
     let user = await User.find({
@@ -90,11 +83,10 @@ router.post('/login', async ctx => {
         password
     })
 
-
     let token = jwt.sign({
         username: username
     }, secret, {
-        expiresIn: '1d'
+        expiresIn: '2h'
     })
     if (code.toLowerCase() === (ctx.session.captcha).toLowerCase()) {
         if (user.length > 0) {
@@ -119,6 +111,40 @@ router.post('/login', async ctx => {
             msg: '验证码不正确'
         }
     }
+})
+
+// 手机号登录
+router.post('/phoneLogin', async ctx => {
+    let { phone, code } = ctx.request.body
+    let user = await User.findOne({ phone })
+    if (user) {
+        let token = jwt.sign({
+            phone
+        }, secret, {
+            expiresIn: '2h'
+        })
+        if (code === ctx.session.sms) {
+            ctx.body = {
+                code: 200,
+                msg: '登录成功',
+                data: user,
+                token
+            }
+        } else {
+            ctx.body = {
+                code: 400,
+                msg: '验证码错误',
+            }
+        }
+
+
+    } else {
+        ctx.body = {
+            code: 500,
+            msg: '用户不存在'
+        }
+    }
+
 })
 
 // 删除用户
@@ -319,7 +345,7 @@ router
                     })
                     .then(res => {
                         ctx.session.githubUser = res
-                        ctx.redirect(`http://localhost:9527`)
+                            // ctx.redirect(`http://localhost:9527`)
                     })
             }).catch(e => {
                 console.log(e)
@@ -336,5 +362,14 @@ router.get('/githubUser', async ctx => {
         }
     }
 })
+
+router.get('/menus', async ctx => {
+    ctx.body = {
+        code: 200,
+        data: menus,
+        msg: '获取成功'
+    }
+})
+
 
 module.exports = router

@@ -11,9 +11,15 @@ import './bus'
 import i18n from './lang/index'
 import IntroJs from 'intro.js'
 import 'intro.js/introjs.css';
+import echarts from 'echarts'
+import VCharts from 'v-charts'
+
+
+
 
 Vue.use(IntroJs);
 Vue.use(ElementUI)
+Vue.use(VCharts)
 Vue.prototype.$dayjs = dayjs
 Vue.config.productionTip = false
 

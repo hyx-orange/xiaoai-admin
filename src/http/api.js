@@ -16,8 +16,8 @@ export default {
         return service.post('/users/sendMsg', { phone })
     },
     //  短信登录  手机号登录
-    phoneLogin({ phone, code, captcha }) {
-        return service.post('/users/phoneLogin', { phone, code, captcha })
+    phoneLogin({ phone, code }) {
+        return service.post('/users/phoneLogin', { phone, code })
     },
     // 修改用户信息
     userUpdate(params) {
@@ -29,11 +29,11 @@ export default {
     },
     // 修改头像  /users/upload
     upload(params) {
-        return service.post('/users/upload', params)
+        return service.post('/upload/image', params)
     },
     //修改密码
-    updateCPass({ id, password, newpass }) {
-        return service.post('/users/updatePass', { id, password, newpass })
+    updatePwd({ id, username, password, newPwd }) {
+        return service.post('/users/updatePwd', { id, username, password, newPwd })
     },
     // 找回密码
     forget({ username, email }) {
@@ -58,4 +58,92 @@ export default {
     userList({ pageSize = 10, pageNumber = 1, keywords = '', state = 1, }) {
         return service.get(`api/users/list?pageSize=${pageSize}&pageNumber=${pageNumber}&keywords=${keywords}&state=${state}`)
     },
+    // 获取菜单(get)
+    menus() {
+        return service.get('/users/menus')
+    },
+
+    // 日程
+
+    // 获取日程(get)
+    calendar() {
+        return service.get('/calendar')
+    },
+    // 添加日程(post)
+    //     users: 参与人(数组)
+    // startTime: 开始时间(date类型)
+    // endTime: 结束时间(date类型)
+    // schedule: 日程内容
+    // currentDay: 当前日期(string类型)
+    addCalendar(params) {
+        return service.post('/calendar', params)
+    },
+    // 删除日程(post)
+    delCalendar(id) {
+        return service.post('/delCalendar', id)
+    },
+    // 重复上周(post)
+    // currentDay: 当前日期
+    repeatDynamic(currentDay) {
+        return service.post('/repeatDynamic', currentDay)
+    },
+    // 上传图片(post)
+    // file: 图片
+    uploadImage(file) {
+        return service.post('/upload/image', file)
+    },
+
+    // 动态
+    // 发布动态(post)
+    //     username: 发布人
+    // date: 发布时间
+    // dynamic: 动态内容
+    // classification: 动态类型
+    // reportUsers: 汇报人(可选)
+    addDynamic(params) {
+        return service.post('/addDynamic', params)
+    },
+    // 获取动态(get)
+    getDynamic() {
+        return service.get('/getDynamic')
+    },
+
+
+    // 首页进度条数据(get)
+    progress() {
+        return service.get('/progress')
+    },
+    // 首页利润(get)
+    cityValue() {
+        return service.get('/cityValue')
+    },
+    // 动态汇报人(get)
+    report() {
+        return service.get('/report')
+    },
+    // 网站调查(get)
+    question() {
+        return service.get('/question')
+    },
+    // 通讯录(get) 
+    getMailList() {
+        return service.get('/getMailList')
+    },
+    // 通讯录部门(get)
+    getTreeData() {
+        return service.get('/getTreeData')
+    },
+    // offer状态(get)
+    getOffer() {
+        return service.get('/getOffer')
+    },
+    // 获取员工信息(get)
+    userInfo() {
+        return service.get('/userInfo')
+    },
+    // 薪酬信息(get)
+    pay() {
+        return service.get('/pay')
+    },
+
 }

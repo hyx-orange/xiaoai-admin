@@ -125,6 +125,8 @@ export default {
               this.getCaptcha();
               this.ruleForm.code = "";
             }
+          } else {
+            let flage = await this.phoneLogin(this.ruleForm);
           }
         } else {
           this.$message({

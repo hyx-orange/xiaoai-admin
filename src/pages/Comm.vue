@@ -32,6 +32,15 @@
     </div>
     <div class="content">
       <headerHome :isCollapse.sync="isCollapse"></headerHome>
+      <div class="breadcrumb">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item :to="{ path: '/' }">{{$t(`commons.dashboard`)}}</el-breadcrumb-item>
+          <el-breadcrumb-item
+            v-for="(item,index) in breadcrumbList"
+            :key="index"
+          >{{$t(`commons.${item}`)}}</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
       <router-view></router-view>
     </div>
   </div>
@@ -39,6 +48,9 @@
 
 <script>
 import headerHome from "../components/comm/HeaderRight";
+import { createNamespacedHelpers } from "vuex";
+const otherModule = createNamespacedHelpers("other");
+const { mapActions: otherAtions, mapState: otherState } = otherModule;
 export default {
   data() {
     return {
@@ -96,22 +108,41 @@ export default {
           ]
         }
       ],
-      isCollapse: false
+      isCollapse: false,
+      breadcrumbList: []
     };
   },
   components: {
     headerHome
   },
   props: {},
-  methods: {},
+  methods: {
+    ...otherAtions(["getMenus"]),
+    getbreadcrumb() {
+      let meta = this.$route.meta;
+      this.breadcrumbList = [];
+      if (meta.enName !== "dashboard") this.breadcrumbList.push(meta.enName);
+      if (meta.parentName) {
+        this.breadcrumbList.unshift(meta.parentName);
+      }
+    }
+  },
   mounted() {},
   beforeMount() {
     if (localStorage.getItem("userInfo")) {
       this.$store.state.userInfo = JSON.parse(localStorage.getItem("userInfo"));
     }
+    this.getbreadcrumb();
+    // this.getMenus();
   },
-  watch: {},
-  computed: {}
+  watch: {
+    "$route.path"(val) {
+      this.getbreadcrumb();
+    }
+  },
+  computed: {
+    ...otherState(["menus"])
+  }
 };
 </script>
 
@@ -137,6 +168,10 @@ export default {
   }
   .content {
     flex: 1;
+    padding: 0 20px;
+    .breadcrumb {
+      padding: 20px 0;
+    }
   }
 }
 </style>

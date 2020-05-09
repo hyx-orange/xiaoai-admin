@@ -7,7 +7,8 @@ module.exports = {
     secret: 'lrlaym',
     accessKeyId: 'LTAI4FpCzJFeLcvtwkhsVukz', // 阿里云短信key
     secretAccessKey: 'wrybZ2IhfvsCkMYjl79jeSN0tjZJIp', // 阿里云短信accessKey
-    whitePath: ['/', '/users/login', '/users/register', '/users/captcha', '/users/sendMsg',
-        '/users/findPwd', '/users/logout',
+    whitePath: ['/', '/users/login', '/users/register', '/users/captcha', '/users/phoneLogin', '/users/sendMsg',
+        '/users/findPwd', '/users/logout', , /^\/api/, /\.(jpg|jepg|gif|png)$/
+
     ], // 忽略验证的接口
 }

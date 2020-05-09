@@ -18,7 +18,9 @@ const routes = [{
                 name: "home",
                 component: Home,
                 meta: {
-                    title: '首页'
+                    title: '首页',
+                    enName: "dashboard",
+                    parentName: null,
                 }
             },
             {
@@ -27,7 +29,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/calendar/Calendar'),
                 meta: {
-                    title: '日程管理'
+                    title: '日程管理',
+                    enName: "calendar",
+                    parentName: null,
                 }
             },
             {
@@ -36,7 +40,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/mailList/MailList'),
                 meta: {
-                    title: '通讯录'
+                    title: '通讯录',
+                    enName: "mailList",
+                    parentName: null,
                 }
             },
             {
@@ -45,7 +51,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/organization/Offer'),
                 meta: {
-                    title: 'offer管理'
+                    title: 'offer管理',
+                    enName: "offer",
+                    parentName: 'organize',
                 }
             },
             {
@@ -54,7 +62,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/organization/UserInfo'),
                 meta: {
-                    title: '人员信息'
+                    title: '人员信息',
+                    enName: "userInfo",
+                    parentName: 'organize',
                 }
             },
             {
@@ -63,7 +73,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/organization/Pay'),
                 meta: {
-                    title: '薪酬管理'
+                    title: '薪酬管理',
+                    enName: "payMent",
+                    parentName: 'organize',
                 }
             },
             {
@@ -72,7 +84,9 @@ const routes = [{
                 component: () =>
                     import ( /* webpackChunkName: "about" */ '../pages/form/StepForm'),
                 meta: {
-                    title: '分步表单'
+                    title: '分步表单',
+                    enName: "stepForm",
+                    parentName: 'form',
                 }
             },
         ],

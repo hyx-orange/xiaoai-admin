@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from "./user"
+import other from "./other"
+import calendar from "./calendar"
 
 Vue.use(Vuex)
 
@@ -17,5 +19,7 @@ export default new Vuex.Store({
     actions: {},
     modules: {
         user,
+        other,
+        calendar
     }
 })
