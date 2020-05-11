@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import user from "./user"
 import other from "./other"
 import calendar from "./calendar"
+import mainList from "./mainList"
+import organization from "./organization"
 
 Vue.use(Vuex)
 
@@ -20,6 +22,8 @@ export default new Vuex.Store({
     modules: {
         user,
         other,
-        calendar
+        calendar,
+        mainList,
+        organization,
     }
 })

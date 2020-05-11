@@ -123,7 +123,7 @@ app.on('error', (err, ctx) => {
     console.error('server error', err, ctx)
 })
 
-mongoose.connect('mongodb://49.233.66.125:27017/oa-admin', {
+mongoose.connect('mongodb://localhost:27017/oa-admin', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, err => {

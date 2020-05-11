@@ -1,14 +1,17 @@
 <template>
   <div class="lunarFullCalendar">
     <div class="full-calendar">
+      <!-- 富日历 -->
       <LunarFullCalendar
         ref="calender"
         :events="events"
         :config="config"
         @event-selected="eventClick"
         @day-click="dayClick"
+        @event-render="eventRender"
       ></LunarFullCalendar>
     </div>
+    <!-- 添加日程 -->
     <el-dialog :visible.sync="dialogVisible" width="650px">
       <span slot="title" class="dialog-header">日程</span>
       <el-form
@@ -68,6 +71,7 @@
                 style="color: rgb(2, 133, 220); font-size: 18px; margin-left: 8px;"
                 class="el-icon-circle-plus-outline"
               ></span>
+              <!-- <i class=""></i> -->
             </el-popover>
           </div>
         </el-form-item>
@@ -83,6 +87,7 @@
 <script>
 import { LunarFullCalendar } from "vue-lunar-full-calendar";
 import { createNamespacedHelpers } from "vuex";
+import { async } from "q";
 const calendarModule = createNamespacedHelpers("calendar");
 const { mapActions: calendarAtions, mapState: calendarState } = calendarModule;
 export default {
@@ -90,8 +95,11 @@ export default {
     let self = this;
     return {
       events: [],
+
       config: {
         eventLimitText: "更多",
+        lazyFetching: true, //是否启用懒加载技术-
+        eventStartEditable: false,
         header: {
           left: "prevYear,prev,next,nextYear",
           center: "title"
@@ -145,30 +153,54 @@ export default {
     ]),
     //日历事件点击事件
     eventClick(event, jsEvent, pos) {
-      console.log(event);
-      this.$confirm("此操作将永久删除该日程, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
+      let _this = this;
+      if (event.schedule) {
+        // 删除日程
+        this.$confirm("此操作将永久删除该日程, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
+          .then(async () => {
+            _this.delCalendar(event._id);
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消删除"
+            });
           });
-        });
+      } else {
+        // 重复上周
+        this.$confirm("是否重复上周日程, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(async () => {
+            _this.repeatDynamic(event.start.format("YYYY-MM-DD"));
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消"
+            });
+          });
+      }
     },
     //背景点击事件
     dayClick(date, jsEvent, view) {
-      this.ruleForm.currentDay = this.$dayjs(date._d).format("YYYY-MM-DD");
-      this.dialogVisible = true;
+      if (date._d < this.$dayjs(new Date()).subtract(1, "days")) {
+        this.$message({
+          message: "不能安排今天之前的日程",
+          type: "warning"
+        });
+      } else {
+        this.ruleForm.currentDay = this.$dayjs(date._d).format("YYYY-MM-DD");
+        this.dialogVisible = true;
+      }
     },
+    // 展示日程
     viewRender(view, element) {
       var time = view.calendar.currentDate._i;
 
@@ -200,20 +232,18 @@ export default {
       let b = timeNumber + 60 * 60 * Number(a[0]) + 60 * Number(a[1]);
       return new Date(b);
     },
-    // 确认
+    // 确认添加
     submit(formName) {
       this.$refs[formName].validate(async valid => {
         if (valid) {
           let obj = Object.assign({}, this.ruleForm);
-          obj.startTime = new Date(
-            `${obj.currentDay} ${obj.startTime}:00`
-          ).getTime();
-          obj.endTime = new Date(
-            `${obj.currentDay} ${obj.endTime}:00`
-          ).getTime();
-
+          obj.startTime = `${obj.currentDay} ${obj.startTime}:00`;
+          obj.endTime = `${obj.currentDay} ${obj.endTime}:00`;
           obj.currentDay = this.$dayjs(obj.currentDay).format("YYYY-MM-DD");
-          this.addCalendar(obj);
+          let flage = await this.addCalendar(obj);
+          if (flage) {
+            this.$refs.ruleForm.resetFields();
+          }
           this.dialogVisible = false;
         } else {
           this.$message({
@@ -222,10 +252,27 @@ export default {
           });
         }
       });
+    },
+    // 渲染展示日程
+    eventRender(event, element) {
+      if (event.schedule) {
+        let a =
+          this.$dayjs(event.startTime).format("hh:mm") +
+          " - " +
+          this.$dayjs(event.endTime).format("hh:mm") +
+          event.schedule;
+        element[0].innerHTML =
+          a +
+          "<br/>" +
+          `参与人：${event.users.join(" ")} ` +
+          "<br/>" +
+          `参与人数: <i class="el-icon-user-solid"></i>${event.users.length}`;
+      }
     }
   },
   mounted() {},
   beforeMount() {
+    // 获取日程
     this.getCalendar();
     if (localStorage.getItem("userInfo")) {
       let username = JSON.parse(localStorage.getItem("userInfo")).username;
@@ -235,20 +282,33 @@ export default {
   watch: {
     calendar(val) {
       this.events = val;
+      let arr = [];
+      // 处理日程
       this.events.map(item => {
-        item.title =
-          this.$dayjs(item.startTime).format("hh:mm") +
-          " - " +
-          this.$dayjs(item.endTime).format("hh:mm") +
-          item.schedule;
-        item.start = item.startTime;
-        item.end = item.endTime;
+        item.start = item.currentDay + " 00:00:00";
+        item.end = item.currentDay + " 00:00:00";
+        item.title = item.schedule;
+        let a =
+          new Date(item.currentDay + " 00:00:00").valueOf() * 1 +
+          86400 * 7 * 1000;
+        let b = this.$dayjs(a).format("YYYY-MM-DD");
+        let flage = val.some(items => items.currentDay === b);
+        if (!flage) {
+          let c = {
+            start: b + " 00:00:00",
+            end: b + " 00:00:00",
+            title: "重复上周",
+            backgroundColor: "pink!important"
+          };
+          arr.push(c);
+        }
       });
-      console.log(this.events);
+      this.events = this.events.concat(arr);
     }
   },
   computed: {
     ...calendarState(["calendar"]),
+    // 处理参与人
     getUser() {
       return this.ruleForm.users.join(" ");
     }
@@ -276,5 +336,8 @@ export default {
   .t-time {
     width: 80px;
   }
+}
+::v-deep .fc-time {
+  display: none;
 }
 </style>

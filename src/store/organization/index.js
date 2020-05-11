@@ -5,24 +5,32 @@ import router from "../../router"
 export default {
     namespaced: true,
     state: {
-        calendar: [],
+        offer: [],
+        user: [],
+        pay: [],
     },
     mutations: {
-        setCalendar(state, data) {
-            state.calendar = data
+        setOffer(state, data) {
+            state.offer = data
+        },
+        setUser(state, data) {
+            state.user = data
+        },
+        setPay(state, data) {
+            state.pay = data
         },
     },
     actions: {
-        // 获取日程(get)
-        async getCalendar({ commit }) {
+        // offer状态(get)
+        async getOffer({ commit }) {
             try {
-                let res = await api.calendar()
+                let res = await api.getOffer()
                 if (res.code === 200) {
-                    commit("setCalendar", res.data)
+                    commit("setOffer", res.data)
                     return true
                 } else {
                     if (res.code === 500) {
-                        commit("setCalendar", [])
+                        commit("setOffer", [])
                     }
                     Notification({
                         title: res.msg,
@@ -34,16 +42,16 @@ export default {
                 return false
             }
         },
-        // 添加日程(post)
-        async addCalendar({ commit, dispatch }, params) {
+        // 获取员工信息(get)
+        async getUserInfo({ commit }) {
             try {
-                let res = await api.addCalendar(params)
+                let res = await api.getUserInfo()
                 if (res.code === 200) {
                     Notification({
                         title: res.msg,
                         type: 'success'
                     });
-                    dispatch("getCalendar")
+                    commit("setUser", res.data)
                     return true
                 } else {
                     Notification({
@@ -56,16 +64,16 @@ export default {
                 return false
             }
         },
-        // 删除日程(post)
-        async delCalendar({ commit, dispatch }, id) {
+        // 获取员工信息(get)
+        async getPay({ commit }) {
             try {
-                let res = await api.delCalendar(id)
+                let res = await api.getPay()
                 if (res.code === 200) {
                     Notification({
                         title: res.msg,
                         type: 'success'
                     });
-                    dispatch("getCalendar")
+                    commit("setPay", res.data)
                     return true
                 } else {
                     Notification({
@@ -78,30 +86,6 @@ export default {
                 return false
             }
         },
-        // 重复上周(post)
-        async repeatDynamic({ commit, dispatch }, currentDay) {
-            try {
-                let res = await api.repeatDynamic(currentDay)
-                if (res.code === 200) {
-                    Notification({
-                        title: res.msg,
-                        type: 'success'
-                    });
-                    dispatch("getCalendar")
-                    return true
-                } else {
-                    Notification({
-                        title: res.msg,
-                        type: 'warning'
-                    });
-                    return false
-                }
-            } catch (err) {
-                return false
-            }
-        },
-
-
     }
 
 }

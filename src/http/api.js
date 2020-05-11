@@ -80,12 +80,12 @@ export default {
     },
     // 删除日程(post)
     delCalendar(id) {
-        return service.post('/delCalendar', id)
+        return service.post('/delCalendar', { id })
     },
     // 重复上周(post)
     // currentDay: 当前日期
     repeatDynamic(currentDay) {
-        return service.post('/repeatDynamic', currentDay)
+        return service.post('/repeatDynamic', { currentDay })
     },
     // 上传图片(post)
     // file: 图片
@@ -138,11 +138,11 @@ export default {
         return service.get('/getOffer')
     },
     // 获取员工信息(get)
-    userInfo() {
+    getUserInfo() {
         return service.get('/userInfo')
     },
     // 薪酬信息(get)
-    pay() {
+    getPay() {
         return service.get('/pay')
     },
 
